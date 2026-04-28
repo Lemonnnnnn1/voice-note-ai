@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceNote AI - 会议录音转写分析</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // 移除浏览器扩展注入的元素
+      document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('ai-translate-content-root');
+        if (el) el.remove();
+      });
+      // 也尝试立即执行（页面加载过程中可能已存在）
+      var el = document.getElementById('ai-translate-content-root');
+      if (el) el.remove();
+    </script>
+  </body>
+</html>

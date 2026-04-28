@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Backend
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Uploads (don't commit temp files)
+backend/uploads/temp/*
+!backend/uploads/temp/.gitkeep
+
+# Database
+*.db
+*.sqlite
+
+# Misc
+*.bak
+*.tmp
