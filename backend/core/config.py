@@ -46,8 +46,11 @@ class Settings(BaseSettings):
     # AssemblyAI API Key (for speaker diarization)
     ASSEMBLYAI_API_KEY: Optional[str] = None
 
+    # Deepgram API Key (for cloud transcription)
+    DEEPGRAM_API_KEY: Optional[str] = None
+
     # CORS
-    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173", "https://*.vercel.app"]
 
 
 settings = Settings()

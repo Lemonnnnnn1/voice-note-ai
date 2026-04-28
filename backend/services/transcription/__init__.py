@@ -498,3 +498,158 @@ class TranscriptionService:
             duration=duration,
             speakers=list(speakers_dict.values())
         )
+
+    async def transcribe_with_deepgram(
+        self,
+        audio_path: str,
+        enable_speaker_recognition: bool = False
+    ) -> TranscriptionResult:
+        """
+        Transcribe audio using Deepgram API.
+
+        Args:
+            audio_path: Path to the audio file
+            enable_speaker_recognition: Whether to enable speaker diarization
+
+        Returns:
+            TranscriptionResult object
+        """
+        import requests
+        from core.config import settings
+
+        api_key = settings.DEEPGRAM_API_KEY
+        if not api_key:
+            raise ValueError("DEEPGRAM_API_KEY not configured")
+
+        print(f"[DEBUG] Starting Deepgram transcription for: {audio_path}")
+
+        # Step 1: Upload file to Deepgram
+        with open(audio_path, "rb") as f:
+            upload_response = requests.post(
+                "https://api.deepgram.com/v1/upload",
+                headers={"Authorization": f"Token {api_key}"},
+                data=f,
+                timeout=60
+            )
+
+        if upload_response.status_code != 200:
+            raise Exception(f"Upload failed: {upload_response.status_code} {upload_response.text}")
+
+        upload_result = upload_response.json()
+        audio_url = upload_result.get("upload_url")
+        print(f"[DEBUG] Audio uploaded to Deepgram, URL: {audio_url}")
+
+        # Step 2: Start transcription
+        params = {
+            "model": "nova-2",
+            "language": "zh-CN",
+            "smart_format": "true",
+            "punctuate": "true",
+            " diarize": "true" if enable_speaker_recognition else "false",
+            "paragraphs": "true",
+        }
+
+        transcript_response = requests.post(
+            audio_url,
+            headers={
+                "Authorization": f"Token {api_key}",
+            },
+            params=params,
+            timeout=120
+        )
+
+        if transcript_response.status_code != 200:
+            raise Exception(f"Transcription failed: {transcript_response.status_code} {transcript_response.text}")
+
+        result = transcript_response.json()
+        print(f"[DEBUG] Deepgram transcription result keys: {result.keys()}")
+
+        # Step 3: Parse results
+        results = result.get("results", {})
+        channels = results.get("channels", [])
+
+        if not channels:
+            raise Exception("No transcription results returned")
+
+        alternatives = channels[0].get("alternatives", [])
+        if not alternatives:
+            raise Exception("No alternatives in transcription result")
+
+        words_info = alternatives[0].get("words", [])
+        paragraphs = alternatives[0].get("paragraphs", {}).get("transcript", [])
+
+        # Build segments from words
+        segments = []
+        speakers_dict = {}
+        speaker_counter = 0
+        current_speaker = None
+        current_segment_start = None
+        current_segment_end = None
+        current_text_parts = []
+
+        # Group words by speaker and time
+        for word_info in words_info:
+            word = word_info.get("word", "")
+            start = word_info.get("start", 0)
+            end = word_info.get("end", 0)
+            speaker = word_info.get("speaker", None)
+
+            if speaker != current_speaker:
+                # Save previous segment
+                if current_segment_start is not None and current_text_parts:
+                    simplified_text = to_simplified_chinese(" ".join(current_text_parts))
+                    segments.append({
+                        "start": current_segment_start,
+                        "end": current_segment_end,
+                        "text": simplified_text,
+                        "speaker": current_speaker or "未知说话人"
+                    })
+                    if current_speaker and current_speaker not in speakers_dict:
+                        speakers_dict[current_speaker] = {
+                            "id": current_speaker,
+                            "name": f"说话人 {speaker_counter + 1}",
+                            "color": self._get_speaker_color(speaker_counter)
+                        }
+                        speaker_counter += 1
+
+                # Start new segment
+                current_speaker = speaker
+                current_segment_start = start
+                current_text_parts = [word]
+            else:
+                current_text_parts.append(word)
+
+            current_segment_end = end
+
+        # Don't forget the last segment
+        if current_segment_start is not None and current_text_parts:
+            simplified_text = to_simplified_chinese(" ".join(current_text_parts))
+            segments.append({
+                "start": current_segment_start,
+                "end": current_segment_end,
+                "text": simplified_text,
+                "speaker": current_speaker or "未知说话人"
+            })
+            if current_speaker and current_speaker not in speakers_dict:
+                speakers_dict[current_speaker] = {
+                    "id": current_speaker,
+                    "name": f"说话人 {speaker_counter + 1}",
+                    "color": self._get_speaker_color(speaker_counter)
+                }
+
+        # Build full text
+        full_text = " ".join([seg["text"] for seg in segments])
+
+        # Calculate duration
+        duration = max([seg["end"] for seg in segments]) if segments else 0
+
+        print(f"[DEBUG] Deepgram result: {len(segments)} segments, {len(speakers_dict)} speakers")
+
+        return TranscriptionResult(
+            id=str(uuid.uuid4()),
+            text=full_text,
+            language="zh",
+            segments=segments,
+            duration=duration,
+            speakers=list(speakers_dict.values()) if speakers_dict else []
+        )

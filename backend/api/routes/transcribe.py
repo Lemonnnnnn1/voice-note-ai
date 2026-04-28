@@ -188,19 +188,28 @@ async def transcribe_audio(
 
 async def run_transcription(file_id: str, file_path: str, model: str, enable_speaker_recognition: bool = False, auto_analyze: bool = False, user_id: str = None, project_id: str = None, file_name: str = "audio_file", file_size: int = 0):
     """Background task to run transcription."""
-    print(f"[DEBUG] run_transcription started: file_id={file_id}, user_id={user_id}, file_size={file_size}, enable_speaker_recognition={enable_speaker_recognition}, auto_analyze={auto_analyze}")
+    print(f"[DEBUG] run_transcription started: file_id={file_id}, user_id={user_id}, file_size={file_size}, model={model}, enable_speaker_recognition={enable_speaker_recognition}, auto_analyze={auto_analyze}")
     try:
-        # Use AssemblyAI for full pipeline when speaker recognition is enabled
-        if enable_speaker_recognition:
-            print(f"[DEBUG] Using AssemblyAI for transcription with speaker diarization")
-            result = await transcription_service.transcribe_with_assemblyai(file_path)
+        # Use Deepgram for cloud transcription (default for deployment)
+        if model == "deepgram" or model == "faster-whisper":
+            print(f"[DEBUG] Using Deepgram for transcription")
+            result = await transcription_service.transcribe_with_deepgram(
+                file_path,
+                enable_speaker_recognition=enable_speaker_recognition
+            )
         elif model == "faster-whisper":
+            print(f"[DEBUG] Using Faster Whisper (local)")
             result = await transcription_service.transcribe_with_faster_whisper(
                 file_path,
                 enable_speaker_recognition=False
             )
         else:
-            raise ValueError(f"Unknown model: {model}")
+            # Default to Deepgram
+            print(f"[DEBUG] Using Deepgram (default) for transcription")
+            result = await transcription_service.transcribe_with_deepgram(
+                file_path,
+                enable_speaker_recognition=enable_speaker_recognition
+            )
 
         print(f"[DEBUG] Transcription completed: id={result.id}, duration={result.duration}, speakers={result.speakers}")
 
