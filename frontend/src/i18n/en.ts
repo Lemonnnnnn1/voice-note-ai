@@ -13,7 +13,7 @@ export const en: Record<TranslationKey, string> = {
 
   // Welcome Screen
   welcomeTitle: 'Smart Meeting Transcription & Analysis',
-  welcomeSubtitle: 'Upload audio files or use microphone to record in real-time. AI will automatically generate meeting summaries, key topics, and action items',
+  welcomeSubtitle: 'Upload audio files. AI will automatically generate meeting summaries, key topics, and action items',
   startRecording: 'Start Recording',
   uploadFile: 'Upload File',
 
@@ -222,7 +222,7 @@ export const en: Record<TranslationKey, string> = {
 
   // About Modal
   aboutVoiceNoteAI: 'About VoiceNote AI',
-  aboutDesc: 'VoiceNote AI is a tool for meeting recording transcription and analysis, supporting real-time recording, file upload and intelligent summary.',
+  aboutDesc: 'VoiceNote AI is a tool for meeting recording transcription and analysis, supporting file upload and intelligent summary.',
   currentVersion: 'Current Version',
   versionNumber: 'v0.1',
   usageScope: 'Usage Scope',

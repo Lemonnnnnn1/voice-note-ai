@@ -11,7 +11,7 @@ export const zh = {
 
   // Welcome Screen
   welcomeTitle: '智能会议转录与分析',
-  welcomeSubtitle: '上传音频文件或使用麦克风实时录制，AI 将自动生成会议摘要、关键议题和行动项',
+  welcomeSubtitle: '上传音频文件，AI 将自动生成会议摘要、关键议题和行动项',
   startRecording: '开始录音',
   uploadFile: '上传文件',
 
@@ -226,7 +226,7 @@ export const zh = {
 
   // About Modal
   aboutVoiceNoteAI: '关于 VoiceNote AI',
-  aboutDesc: 'VoiceNote AI 是一款用于会议录音转写与分析的工具，支持实时录音、文件上传与智能总结。',
+  aboutDesc: 'VoiceNote AI 是一款用于会议录音转写与分析的工具，支持文件上传与智能总结。',
   currentVersion: '当前版本',
   versionNumber: 'v0.1',
   usageScope: '使用范围',

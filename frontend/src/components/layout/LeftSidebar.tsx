@@ -47,13 +47,11 @@ export default function LeftSidebar({ onNavigate }: LeftSidebarProps) {
   ]
 
   const guideSteps = [
-    { icon: Mic, title: t('startRecordingGuide'), desc: t('startRecordingDesc') },
     { icon: FileUp, title: t('uploadFileGuide'), desc: t('uploadFileDesc') },
     { icon: FileSearch, title: t('viewExportGuide'), desc: t('viewExportDesc') }
   ]
 
   const faqItems = [
-    { q: t('recordingNoResponse'), a: t('recordingNoResponseA') },
     { q: t('supportedFormats'), a: t('supportedFormatsA') },
     { q: t('transcriptionTime'), a: t('transcriptionTimeA') },
     { q: t('multilingualSupport'), a: t('multilingualSupportA') },
