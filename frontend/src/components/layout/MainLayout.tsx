@@ -13,7 +13,6 @@ import { useAuth } from '../../context/AuthContext'
 type RightView = 'welcome' | 'analysis' | 'export-settings' | 'app-settings' | 'personal-center'
 
 interface MainLayoutProps {
-  onStartRecording: () => void
   onUploadFile: () => void
   setPendingProjectId: (id: string | null) => void
   rightView: RightView
@@ -21,7 +20,7 @@ interface MainLayoutProps {
   onShowAuthModal: (mode: 'login' | 'register') => void
 }
 
-export default function MainLayout({ onStartRecording, onUploadFile, setPendingProjectId, rightView, onNavigate, onShowAuthModal }: MainLayoutProps) {
+export default function MainLayout({ onUploadFile, setPendingProjectId, rightView, onNavigate, onShowAuthModal }: MainLayoutProps) {
   const { currentFile } = useProject()
   const { isAuthenticated, user } = useAuth()
   const [isProjectTreeCollapsed, setIsProjectTreeCollapsed] = useState(false)
@@ -52,9 +51,9 @@ export default function MainLayout({ onStartRecording, onUploadFile, setPendingP
       case 'personal-center':
         return <PersonalCenter onBack={handleBack} />
       case 'analysis':
-        return currentFile ? <ContentArea file={currentFile} /> : <WelcomeScreen onStartRecording={onStartRecording} onUploadFile={onUploadFile} />
+        return currentFile ? <ContentArea file={currentFile} /> : <WelcomeScreen onUploadFile={onUploadFile} />
       default:
-        return <WelcomeScreen onStartRecording={onStartRecording} onUploadFile={onUploadFile} />
+        return <WelcomeScreen onUploadFile={onUploadFile} />
     }
   }
 

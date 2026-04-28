@@ -19,9 +19,6 @@ function AppContent() {
   const { settings } = useSettings()
   const { isAuthenticated } = useAuth()
   const { setTranscription, setAnalysis, startProcessing, stopProcessing, setProgress } = useAnalysis()
-  const [isRecording, setIsRecording] = useState(false)
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
-  const [audioChunks, setAudioChunks] = useState<Blob[]>([])
   const [rightView, setRightView] = useState<RightView>('welcome')
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login')
@@ -63,40 +60,6 @@ function AppContent() {
       setRightView('analysis')
     }
   }, [currentFile])
-
-  const handleStartRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream)
-      setMediaRecorder(recorder)
-      setAudioChunks([])
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          setAudioChunks(prev => [...prev, event.data])
-        }
-      }
-
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
-        await processAudioBlob(audioBlob, '录音_' + new Date().toLocaleTimeString())
-        stream.getTracks().forEach(track => track.stop())
-      }
-
-      recorder.start()
-      setIsRecording(true)
-    } catch (error) {
-      console.error('Failed to start recording:', error)
-      alert('无法访问麦克风，请检查权限设置')
-    }
-  }
-
-  const handleStopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop()
-      setIsRecording(false)
-    }
-  }
 
   const handleUploadFile = () => {
     fileInputRef.current?.click()
@@ -259,7 +222,6 @@ function AppContent() {
       />
 
       <MainLayout
-        onStartRecording={isRecording ? handleStopRecording : handleStartRecording}
         onUploadFile={handleUploadFile}
         setPendingProjectId={(id) => { pendingProjectIdRef.current = id }}
         rightView={rightView}
@@ -269,19 +231,6 @@ function AppContent() {
           setShowAuthModal(true)
         }}
       />
-
-      {isRecording && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 animate-pulse">
-          <div className="w-3 h-3 bg-white rounded-full" />
-          <span>正在录音...</span>
-          <button
-            onClick={handleStopRecording}
-            className="px-3 py-1 bg-white/20 rounded-full text-sm hover:bg-white/30"
-          >
-            停止
-          </button>
-        </div>
-      )}
 
       <AuthModal
         isOpen={showAuthModal}

@@ -1,13 +1,12 @@
 import React from 'react'
-import { Mic, Upload, FileAudio } from 'lucide-react'
+import { Upload, FileAudio } from 'lucide-react'
 import { useI18n } from '../../context/I18nContext'
 
 interface WelcomeScreenProps {
-  onStartRecording: () => void
   onUploadFile: () => void
 }
 
-export default function WelcomeScreen({ onStartRecording, onUploadFile }: WelcomeScreenProps) {
+export default function WelcomeScreen({ onUploadFile }: WelcomeScreenProps) {
   const { t } = useI18n()
 
   return (
@@ -31,21 +30,14 @@ export default function WelcomeScreen({ onStartRecording, onUploadFile }: Welcom
       <div className="flex flex-col items-center gap-3">
         {/* Call to Action */}
         <p className="text-lg text-text-primary dark:text-dark-text font-medium">
-          {t('startRecording')}
+          {t('uploadFile')}
         </p>
 
         {/* Action Buttons */}
         <div className="flex gap-4">
           <button
-            onClick={onStartRecording}
-            className="flex items-center gap-2 px-5 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-md text-base font-medium"
-          >
-            <Mic className="w-4 h-4" />
-            {t('startRecording')}
-          </button>
-          <button
             onClick={onUploadFile}
-            className="flex items-center gap-2 px-5 py-3 bg-surface-card dark:bg-dark-card border border-border dark:border-dark-border text-text-primary dark:text-dark-text rounded-xl hover:bg-surface-sidebar dark:hover:bg-dark-sidebar transition-colors shadow-md text-base font-medium"
+            className="flex items-center gap-2 px-5 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-md text-base font-medium"
           >
             <Upload className="w-4 h-4" />
             {t('uploadFile')}
